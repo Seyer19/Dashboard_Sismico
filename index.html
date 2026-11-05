@@ -4,9 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Sismic Dashboard</title>
+  <!-- Tipografias del proyecto (guia Tipografias.site) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Istok+Web:wght@400;700&family=Jacques+Francois&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tokens iguales a las variables de Figma (Proyecto/Color) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'importante': '#880000',
+            'importante-hover': '#6E0000'
+          },
+          fontFamily: {
+            titulo: ['"Jacques Francois"', 'serif'],
+            texto: ['"Istok Web"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
   <!-- Chart.js para la gráfica de onda -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Leaflet CSS y JS para los mapas -->
@@ -15,13 +36,13 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-gray-900 text-gray-800 flex justify-center items-center min-h-screen p-0 sm:p-4 font-sans select-none">
+<body class="bg-gray-900 text-gray-800 flex justify-center items-center min-h-screen p-0 sm:p-4 font-texto select-none">
 
   <!-- Marco del Dispositivo Móvil -->
   <div id="device-container" class="relative w-full max-w-[412px] h-[892px] bg-white sm:rounded-[40px] shadow-2xl overflow-hidden flex flex-col border-0 sm:border-[8px] border-gray-800">
     
     <!-- Barra de Estado Simulada -->
-    <div class="h-8 bg-black text-white px-6 flex justify-between items-center text-xs font-semibold z-50 shrink-0">
+    <div id="status-bar" class="absolute top-0 left-0 right-0 h-8 px-6 flex justify-between items-center text-xs font-bold z-[60]">
       <span>9:41</span>
       <div class="flex items-center gap-2">
         <span>5G</span>
@@ -30,10 +51,10 @@
     </div>
 
     <!-- PANTALLA 2: Alerta Inicial Roja -->
-    <div id="screen-2" class="screen active flex-col justify-between bg-[#8B0000] text-white p-6 pt-6 relative">
+    <div id="screen-2" class="screen active flex-col justify-between bg-importante text-white p-6 pt-con-barra relative">
       <div class="flex justify-center mt-2">
-        <span class="bg-white text-[#8B0000] text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow">
-          <span class="w-2 h-2 rounded-full bg-[#8B0000] animate-ping"></span>
+        <span class="bg-white text-importante text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow">
+          <span class="w-2 h-2 rounded-full bg-importante animate-ping"></span>
           ALERTA SÍSMICA
         </span>
       </div>
@@ -42,19 +63,19 @@
         <div class="relative mb-6">
           <div class="w-32 h-32 rounded-full border border-white/20 flex items-center justify-center animate-pulse">
             <div class="w-24 h-24 rounded-full border border-white/40 flex items-center justify-center">
-              <div class="w-16 h-16 rounded-full bg-white text-[#8B0000] flex items-center justify-center shadow-lg">
+              <div class="w-16 h-16 rounded-full bg-white text-importante flex items-center justify-center shadow-lg">
                 <i data-lucide="activity" class="w-10 h-10"></i>
               </div>
             </div>
           </div>
         </div>
 
-        <h1 class="text-3xl font-extrabold leading-tight mb-2">Se pronostica un sismo en tu zona</h1>
+        <h1 class="text-3xl font-bold leading-tight mb-2">Se pronostica un sismo en tu zona</h1>
         <p class="text-sm opacity-90 mb-6">Valle Central · Magnitud estimada 6.2 · Epicentro a 12 km</p>
 
         <div class="w-full bg-black/20 rounded-2xl p-4 backdrop-blur-sm border border-white/10 mb-6">
-          <p class="text-xs uppercase tracking-wider font-semibold opacity-80 mb-1">Llegada estimada en</p>
-          <div class="text-5xl font-black font-mono tracking-tight" id="countdown-timer">00:10</div>
+          <p class="text-xs uppercase tracking-wider font-bold opacity-80 mb-1">Llegada estimada en</p>
+          <div class="text-5xl font-bold tracking-tight tabular-nums" id="countdown-timer">00:10</div>
           <p class="text-xs opacity-70 mt-1">segundos</p>
         </div>
 
@@ -75,41 +96,97 @@
       </div>
 
       <div class="space-y-3 mb-4">
-        <button onclick="navigateTo('screen-4')" class="interactive-btn w-full bg-white text-[#8B0000] font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base active:scale-95 transition">
+        <button onclick="navigateTo('screen-4')" class="interactive-btn w-full bg-white text-importante font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base active:scale-95 transition">
           <i data-lucide="bell-ring" class="w-5 h-5"></i>
           Llamar a emergencias
         </button>
-        <button onclick="navigateTo('screen-5')" class="interactive-btn w-full bg-[#600000] border border-white/30 text-white font-bold py-3.5 rounded-2xl shadow-md text-base active:scale-95 transition">
+        <button onclick="navigateTo('screen-5')" class="interactive-btn w-full bg-transparent border-2 border-white text-white font-bold py-3.5 rounded-2xl shadow-md text-base active:scale-95 transition">
+          Estoy en zona segura
+        </button>
+      </div>
+    </div>
+
+    <!-- PANTALLA 9: Sismo en curso (A06) -->
+    <div id="screen-9" class="screen flex-col justify-between bg-importante text-white p-6 pt-con-barra relative">
+      <div class="flex justify-center mt-2">
+        <span class="bg-white text-importante text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow">
+          <span class="w-2 h-2 rounded-full bg-importante animate-pulse"></span>
+          SISMO EN CURSO
+        </span>
+      </div>
+
+      <div class="flex flex-col items-center text-center my-auto">
+        <div class="relative mb-6">
+          <div class="w-32 h-32 rounded-full border border-white/20 flex items-center justify-center animate-ping-lento">
+            <div class="w-24 h-24 rounded-full border border-white/40 flex items-center justify-center">
+              <div class="w-16 h-16 rounded-full bg-white text-importante flex items-center justify-center shadow-lg">
+                <i data-lucide="activity" class="w-10 h-10"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="text-3xl font-bold leading-tight mb-2">Mantente protegido</h1>
+        <p class="text-sm opacity-90 mb-6">No salgas corriendo. Permanece en tu lugar seguro hasta que termine el movimiento.</p>
+
+        <div class="w-full bg-black/20 rounded-2xl p-4 backdrop-blur-sm border border-white/10 mb-6">
+          <p class="text-xs uppercase tracking-wider font-bold opacity-80 mb-1">Tiempo transcurrido</p>
+          <div class="text-5xl font-bold tracking-tight tabular-nums" id="sismo-timer">00:00</div>
+          <p class="text-xs opacity-70 mt-1">segundos</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 w-full text-center">
+          <div class="bg-black/20 p-2.5 rounded-xl border border-white/10">
+            <span class="block text-xl font-bold">1</span>
+            <span class="text-[11px] opacity-90">Agáchate</span>
+          </div>
+          <div class="bg-black/20 p-2.5 rounded-xl border border-white/10">
+            <span class="block text-xl font-bold">2</span>
+            <span class="text-[11px] opacity-90">Cúbrete</span>
+          </div>
+          <div class="bg-black/20 p-2.5 rounded-xl border border-white/10">
+            <span class="block text-xl font-bold">3</span>
+            <span class="text-[11px] opacity-90">Sujétate</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <button onclick="navigateTo('screen-4')" class="interactive-btn w-full bg-white text-importante font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base active:scale-95 transition">
+          <i data-lucide="bell-ring" class="w-5 h-5"></i>
+          Llamar a emergencias
+        </button>
+        <button onclick="navigateTo('screen-5')" class="interactive-btn w-full bg-transparent border-2 border-white text-white font-bold py-3.5 rounded-2xl shadow-md text-base active:scale-95 transition">
           Estoy en zona segura
         </button>
       </div>
     </div>
 
     <!-- PANTALLA 3: ¿Estás a salvo? -->
-    <div id="screen-3" class="screen flex-col justify-between bg-white text-gray-900 p-6 pt-6">
+    <div id="screen-3" class="screen flex-col justify-between bg-white text-gray-900 p-6 pt-con-barra">
       <div class="pt-2"></div>
       <div class="flex flex-col items-center text-center my-auto">
-        <div class="w-24 h-24 rounded-full border-2 border-red-200 flex items-center justify-center mb-6">
-          <div class="w-16 h-16 rounded-full bg-[#8B0000] text-white flex items-center justify-center shadow-lg">
+        <div class="w-24 h-24 rounded-full border-2 border-gray-200 flex items-center justify-center mb-6">
+          <div class="w-16 h-16 rounded-full bg-importante text-white flex items-center justify-center shadow-lg">
             <i data-lucide="activity" class="w-10 h-10"></i>
           </div>
         </div>
 
-        <h2 class="text-3xl font-extrabold text-[#8B0000] mb-3">¿Estás a salvo?</h2>
+        <h2 class="text-3xl font-bold text-importante mb-3">¿Estás a salvo?</h2>
         <p class="text-sm text-gray-600 max-w-xs mb-8">El movimiento terminó. Confirma tu estado para avisar a tus contactos de emergencia.</p>
 
         <div class="w-full bg-gray-50 rounded-2xl p-4 text-left border border-gray-100 mb-6">
           <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">SISMO REGISTRADO</span>
-          <div class="text-lg font-extrabold text-[#8B0000] mt-1">Mag 6.2 · Valle Central · 14:32</div>
+          <div class="text-lg font-bold text-importante mt-1">Mag 6.2 · Valle Central · 14:32</div>
           <p class="text-xs text-gray-500 mt-0.5">Duración 38 s · Profundidad 10 km</p>
         </div>
       </div>
 
       <div class="space-y-3 mb-4">
-        <button onclick="navigateTo('screen-5')" class="interactive-btn w-full bg-[#8B0000] text-white font-bold py-3.5 rounded-2xl shadow-lg text-base active:scale-95 transition">
+        <button onclick="navigateTo('screen-5')" class="interactive-btn w-full bg-importante text-white font-bold py-3.5 rounded-2xl shadow-lg text-base active:scale-95 transition">
           Sí, estoy a salvo
         </button>
-        <button onclick="navigateTo('screen-4')" class="interactive-btn w-full bg-white border-2 border-[#8B0000] text-[#8B0000] font-bold py-3.5 rounded-2xl text-base active:scale-95 transition">
+        <button onclick="navigateTo('screen-4')" class="interactive-btn w-full bg-white border-2 border-importante text-importante font-bold py-3.5 rounded-2xl text-base active:scale-95 transition">
           Necesito ayuda
         </button>
         <p class="text-[11px] text-center text-gray-400">Aléjate de ventanas y estructuras dañadas. Pueden ocurrir réplicas.</p>
@@ -117,54 +194,54 @@
     </div>
 
     <!-- PANTALLA 4: Llamando a Emergencias (911) -->
-    <div id="screen-4" class="screen flex-col justify-between bg-white text-gray-900 p-6 pt-6">
+    <div id="screen-4" class="screen flex-col justify-between bg-white text-gray-900 p-6 pt-con-barra">
       <div class="pt-2"></div>
       <div class="flex flex-col items-center text-center my-auto">
         <h2 class="text-2xl font-bold text-gray-900 mb-2">Llamando a emergencias</h2>
-        <div class="text-7xl font-black text-[#8B0000] tracking-tighter my-4">911</div>
-        <p class="text-sm text-gray-400 font-mono mb-8" id="call-timer">00:03</p>
+        <div class="text-7xl font-bold text-importante tracking-tighter my-4">911</div>
+        <p class="text-sm text-gray-400 tabular-nums mb-8" id="call-timer">00:00</p>
 
         <div class="w-full bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
           <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">COMPARTIENDO TU UBICACIÓN</span>
-          <p class="text-sm font-bold text-[#8B0000]">Valle Central · 4.21°N 74.08°W</p>
+          <p class="text-sm font-bold text-importante">Valle Central · 4.21°N 74.08°W</p>
         </div>
       </div>
 
       <div class="flex flex-col items-center mb-6">
-        <button onclick="navigateTo('screen-5')" class="interactive-btn w-20 h-20 bg-[#8B0000] rounded-full flex items-center justify-center text-white shadow-xl active:scale-90 transition mb-2">
+        <button onclick="navigateTo('screen-5')" class="interactive-btn w-20 h-20 bg-importante rounded-full flex items-center justify-center text-white shadow-xl active:scale-90 transition mb-2">
           <i data-lucide="phone-off" class="w-8 h-8"></i>
         </button>
-        <span class="text-xs font-semibold text-gray-600">Colgar</span>
+        <span class="text-xs font-bold text-gray-600">Colgar</span>
       </div>
     </div>
 
     <!-- PANTALLA 5: Ubicación a Salvo -->
-    <div id="screen-5" class="screen flex-col justify-between bg-white text-gray-900 p-6 pt-6">
+    <div id="screen-5" class="screen flex-col justify-between bg-white text-gray-900 p-6 pt-con-barra">
       <div class="pt-2"></div>
       <div class="flex flex-col items-center text-center my-auto">
-        <div class="w-24 h-24 rounded-full border-2 border-red-100 flex items-center justify-center mb-6">
-          <div class="w-16 h-16 rounded-full bg-[#8B0000] text-white flex items-center justify-center shadow-lg">
+        <div class="w-24 h-24 rounded-full border-2 border-gray-200 flex items-center justify-center mb-6">
+          <div class="w-16 h-16 rounded-full bg-importante text-white flex items-center justify-center shadow-lg">
             <i data-lucide="activity" class="w-10 h-10"></i>
           </div>
         </div>
 
-        <h2 class="text-3xl font-extrabold text-[#8B0000] mb-3 leading-tight">Esta ubicación está a salvo</h2>
+        <h2 class="text-3xl font-bold text-importante mb-3 leading-tight">Esta ubicación está a salvo</h2>
         <p class="text-sm text-gray-600 max-w-xs mb-8">No hay reportes de daños estructurales en tu zona. Mantente atento a posibles réplicas durante las próximas horas.</p>
 
         <div class="w-full bg-gray-50 rounded-xl p-3.5 flex items-center gap-3 border border-gray-100 text-left">
           <div class="w-6 h-6 rounded-full bg-green-100 text-green-700 flex items-center justify-center shrink-0">
             <i data-lucide="check" class="w-4 h-4"></i>
           </div>
-          <span class="text-xs font-semibold text-gray-700">Tus contactos de emergencia fueron notificados</span>
+          <span class="text-xs font-bold text-gray-700">Tus contactos de emergencia fueron notificados</span>
         </div>
       </div>
 
       <div class="space-y-3 mb-4">
-        <button onclick="navigateTo('screen-4')" class="interactive-btn w-full bg-[#8B0000] text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base active:scale-95 transition">
+        <button onclick="navigateTo('screen-4')" class="interactive-btn w-full bg-importante text-white font-bold py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base active:scale-95 transition">
           <i data-lucide="bell-ring" class="w-5 h-5"></i>
           Llamar emergencias
         </button>
-        <button onclick="navigateTo('screen-1')" class="interactive-btn w-full bg-white border-2 border-[#8B0000] text-[#8B0000] font-bold py-3.5 rounded-2xl text-base active:scale-95 transition">
+        <button onclick="navigateTo('screen-1')" class="interactive-btn w-full bg-white border-2 border-importante text-importante font-bold py-3.5 rounded-2xl text-base active:scale-95 transition">
           Volver al inicio
         </button>
       </div>
@@ -172,9 +249,9 @@
 
     <!-- PANTALLA 1: Inicio / Dashboard -->
     <div id="screen-1" class="screen flex-col bg-gray-50 text-gray-900 overflow-y-auto pb-20">
-      <div class="bg-[#8B0000] text-white px-6 pt-6 pb-6 rounded-b-3xl shadow-md">
+      <div class="bg-importante text-white px-6 pt-con-barra pb-6 rounded-b-3xl shadow-md">
         <div class="flex justify-between items-center">
-          <h1 class="text-2xl font-serif font-bold">SISMIC DASHBOARD</h1>
+          <h1 class="text-2xl font-titulo font-normal">SISMIC DASHBOARD</h1>
           <button class="interactive-btn p-2 rounded-full hover:bg-white/10">
             <i data-lucide="bell" class="w-6 h-6"></i>
           </button>
@@ -183,10 +260,10 @@
 
       <div class="p-4 space-y-4">
         <!-- Alerta Activa Clickable -->
-        <div onclick="navigateTo('screen-8')" class="interactive-btn bg-[#8B0000] text-white p-4 rounded-2xl shadow-lg cursor-pointer hover:bg-[#700000] transition">
+        <div id="banner-alerta" onclick="abrirDetalle('EVT-2026-0001')" class="interactive-btn bg-importante text-white p-4 rounded-2xl shadow-lg cursor-pointer hover:bg-importante-hover transition">
           <div class="flex justify-between items-start mb-1">
             <span class="text-[10px] uppercase font-bold tracking-wider opacity-80">ALERTA ACTIVA EN TU ZONA</span>
-            <span class="text-xs font-semibold underline flex items-center gap-1">Ver detalle &rarr;</span>
+            <span class="text-xs font-bold underline flex items-center gap-1">Ver detalle &rarr;</span>
           </div>
           <h3 class="text-lg font-bold">Sismo Mag 6.2 · Valle Central · hace 2 min</h3>
           <p class="text-xs opacity-80 mt-1">Posibles réplicas en las próximas horas</p>
@@ -195,7 +272,7 @@
         <!-- Ubicación actual -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
           <div class="flex items-center gap-3">
-            <div class="text-[#8B0000]">
+            <div class="text-importante">
               <i data-lucide="map-pin" class="w-6 h-6"></i>
             </div>
             <div>
@@ -203,26 +280,26 @@
               <p class="text-sm font-bold text-gray-800" id="dash-user-loc">Valle Central · 4.21°N 74.08°W</p>
             </div>
           </div>
-          <span class="bg-[#8B0000] text-white text-xs font-bold px-3 py-1 rounded-full">Réplicas</span>
+          <span id="chip-estado-zona" class="bg-importante text-white text-xs font-bold px-3 py-1 rounded-full">Réplicas</span>
         </div>
 
         <!-- Tarjetas de Métricas -->
         <div class="grid grid-cols-2 gap-3">
           <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
             <span class="text-[10px] font-bold text-gray-400 uppercase">MAG. MÁX (24H)</span>
-            <p class="text-3xl font-extrabold text-[#8B0000] mt-1" id="dash-max-mag">6.2</p>
+            <p class="text-3xl font-bold text-importante mt-1" id="dash-max-mag">6.2</p>
           </div>
           <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
             <span class="text-[10px] font-bold text-gray-400 uppercase">EVENTOS (24H)</span>
-            <p class="text-3xl font-extrabold text-gray-900 mt-1" id="dash-total-events">48</p>
+            <p class="text-3xl font-bold text-gray-900 mt-1" id="dash-total-events">48</p>
           </div>
           <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
             <span class="text-[10px] font-bold text-gray-400 uppercase">ALERTAS ACTIVAS</span>
-            <p class="text-3xl font-extrabold text-[#8B0000] mt-1" id="dash-active-alerts">1</p>
+            <p class="text-3xl font-bold text-importante mt-1" id="dash-active-alerts">1</p>
           </div>
           <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
             <span class="text-[10px] font-bold text-gray-400 uppercase">ESTACIONES</span>
-            <p class="text-3xl font-extrabold text-gray-900 mt-1" id="dash-stations">128/134</p>
+            <p class="text-3xl font-bold text-gray-900 mt-1" id="dash-stations">128/134</p>
           </div>
         </div>
 
@@ -230,7 +307,7 @@
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
           <div class="flex justify-between items-center mb-2">
             <span class="text-xs font-bold text-gray-900 uppercase">MAPA SÍSMICO</span>
-            <button onclick="navigateTo('screen-6')" class="interactive-btn text-xs font-bold text-[#8B0000]">Ver todo</button>
+            <button onclick="navigateTo('screen-6')" class="interactive-btn text-xs font-bold text-importante">Ver todo</button>
           </div>
           <div id="map-main" class="h-40 rounded-xl overflow-hidden bg-gray-100 border border-gray-200"></div>
         </div>
@@ -239,7 +316,7 @@
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
           <div class="flex justify-between items-center mb-3">
             <span class="text-xs font-bold text-gray-900 uppercase">EVENTOS RECIENTES</span>
-            <button onclick="navigateTo('screen-6')" class="interactive-btn text-xs font-bold text-[#8B0000]">Ver todos</button>
+            <button onclick="navigateTo('screen-6')" class="interactive-btn text-xs font-bold text-importante">Ver todos</button>
           </div>
           <div class="space-y-3" id="recent-events-container">
             <!-- Inyectado dinámicamente -->
@@ -250,9 +327,9 @@
 
     <!-- PANTALLA 6: Eventos -->
     <div id="screen-6" class="screen flex-col bg-gray-50 text-gray-900 overflow-y-auto pb-20">
-      <div class="bg-[#8B0000] text-white px-6 pt-6 pb-6 rounded-b-3xl shadow-md">
+      <div class="bg-importante text-white px-6 pt-con-barra pb-6 rounded-b-3xl shadow-md">
         <div class="flex justify-between items-center">
-          <h1 class="text-2xl font-serif font-bold">Eventos</h1>
+          <h1 class="text-2xl font-titulo font-normal">Eventos</h1>
           <button class="interactive-btn p-2 rounded-full hover:bg-white/10">
             <i data-lucide="bell" class="w-6 h-6"></i>
           </button>
@@ -261,16 +338,16 @@
 
       <div class="p-4 space-y-4">
         <div class="flex gap-2">
-          <input type="text" id="search-input" placeholder="Buscar ubicación..." class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#8B0000]">
-          <button onclick="openFilterModal()" class="interactive-btn bg-white border border-[#8B0000] text-[#8B0000] font-bold px-4 rounded-xl flex items-center gap-1 text-sm">
+          <input type="text" id="search-input" oninput="buscarEventos(this.value)" placeholder="Buscar ubicación..." class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-importante">
+          <button onclick="openFilterModal()" class="interactive-btn bg-white border border-importante text-importante font-bold px-4 rounded-xl flex items-center gap-1 text-sm">
             <i data-lucide="sliders-horizontal" class="w-4 h-4"></i> Filtros
           </button>
         </div>
 
         <div class="flex gap-2">
-          <button class="interactive-btn bg-[#8B0000] text-white text-xs font-bold px-4 py-1.5 rounded-full">24 h</button>
-          <button class="interactive-btn bg-white border border-gray-200 text-gray-600 text-xs font-bold px-4 py-1.5 rounded-full">7 días</button>
-          <button class="interactive-btn bg-white border border-gray-200 text-gray-600 text-xs font-bold px-4 py-1.5 rounded-full">30 días</button>
+          <button data-grupo="periodo-rapido" data-valor="hoy" onclick="elegirPeriodoRapido(this)" class="interactive-btn chip border text-xs font-bold px-4 py-1.5 rounded-full">24 h</button>
+          <button data-grupo="periodo-rapido" data-valor="7" onclick="elegirPeriodoRapido(this)" class="interactive-btn chip border text-xs font-bold px-4 py-1.5 rounded-full">7 días</button>
+          <button data-grupo="periodo-rapido" data-valor="30" onclick="elegirPeriodoRapido(this)" class="interactive-btn chip border text-xs font-bold px-4 py-1.5 rounded-full">30 días</button>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 divide-y divide-gray-100" id="all-events-container">
@@ -281,9 +358,9 @@
 
     <!-- PANTALLA 7: Alertas / Configuración -->
     <div id="screen-7" class="screen flex-col bg-gray-50 text-gray-900 overflow-y-auto pb-20">
-      <div class="bg-[#8B0000] text-white px-6 pt-6 pb-6 rounded-b-3xl shadow-md">
+      <div class="bg-importante text-white px-6 pt-con-barra pb-6 rounded-b-3xl shadow-md">
         <div class="flex justify-between items-center">
-          <h1 class="text-2xl font-serif font-bold">Alertas</h1>
+          <h1 class="text-2xl font-titulo font-normal">Alertas</h1>
           <button class="interactive-btn p-2 rounded-full hover:bg-white/10">
             <i data-lucide="bell" class="w-6 h-6"></i>
           </button>
@@ -291,11 +368,11 @@
       </div>
 
       <div class="p-4 space-y-4">
-        <!-- Modo Prueba Facilitador -->
-        <div class="border-2 border-dashed border-[#8B0000] rounded-2xl p-4 bg-red-50/50">
-          <span class="text-[10px] font-bold text-[#8B0000] uppercase tracking-wider block mb-1">MODO PRUEBA (SOLO PARA EL FACILITADOR)</span>
+        <!-- Modo prueba: solo para el facilitador -->
+        <div class="border-2 border-dashed border-gray-300 rounded-2xl p-4 bg-white">
+          <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">MODO PRUEBA (SOLO PARA EL FACILITADOR)</span>
           <p class="text-sm font-bold text-gray-900 mb-3">Simula una alerta sísmica en tu zona</p>
-          <button onclick="navigateTo('screen-2')" class="interactive-btn w-full bg-[#8B0000] text-white font-bold py-3 rounded-xl text-sm shadow active:scale-95 transition">
+          <button onclick="navigateTo('screen-2')" class="interactive-btn w-full bg-importante text-white font-bold py-3 rounded-xl text-sm shadow active:scale-95 transition">
             Simular alerta
           </button>
         </div>
@@ -303,55 +380,64 @@
         <!-- Umbrales de Activación -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-4">
           <span class="text-xs font-bold text-gray-900 uppercase">UMBRALES DE ACTIVACIÓN</span>
-          <div class="flex justify-between items-center text-sm py-1 border-b border-gray-50">
+          <label class="flex justify-between items-center text-sm py-1 border-b border-gray-50">
             <span class="text-gray-600">Magnitud mínima</span>
-            <span class="font-bold bg-gray-100 px-3 py-1 rounded-lg">4.0 ▼</span>
-          </div>
-          <div class="flex justify-between items-center text-sm py-1 border-b border-gray-50">
+            <select id="umbral-magnitud" class="campo-select">
+              <option value="3.0">3.0</option>
+              <option value="4.0" selected>4.0</option>
+              <option value="5.0">5.0</option>
+              <option value="6.0">6.0</option>
+            </select>
+          </label>
+          <label class="flex justify-between items-center text-sm py-1 border-b border-gray-50">
             <span class="text-gray-600">Profundidad máxima</span>
-            <span class="font-bold bg-gray-100 px-3 py-1 rounded-lg">100 km ▼</span>
-          </div>
-          <div class="flex justify-between items-center text-sm py-1">
+            <select id="umbral-profundidad" class="campo-select">
+              <option value="50">50 km</option>
+              <option value="100" selected>100 km</option>
+              <option value="300">300 km</option>
+              <option value="700">700 km</option>
+            </select>
+          </label>
+          <label class="flex justify-between items-center text-sm py-1">
             <span class="text-gray-600">Radio de alerta</span>
-            <span class="font-bold bg-gray-100 px-3 py-1 rounded-lg">500 km ▼</span>
-          </div>
+            <select id="umbral-radio" class="campo-select">
+              <option value="100">100 km</option>
+              <option value="250">250 km</option>
+              <option value="500" selected>500 km</option>
+              <option value="1000">1000 km</option>
+            </select>
+          </label>
         </div>
 
-        <!-- Nivel de Prioridad -->
+        <!-- Nivel de Prioridad (seleccion unica) -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
           <span class="text-xs font-bold text-gray-900 uppercase">NIVEL DE PRIORIDAD</span>
           <div class="grid grid-cols-4 gap-1.5">
-            <button class="interactive-btn border border-gray-200 text-gray-600 py-2 rounded-xl text-xs font-bold">Baja</button>
-            <button class="interactive-btn border border-gray-200 text-gray-600 py-2 rounded-xl text-xs font-bold">Moderada</button>
-            <button class="interactive-btn bg-[#8B0000] text-white py-2 rounded-xl text-xs font-bold">Alta</button>
-            <button class="interactive-btn border border-gray-200 text-gray-600 py-2 rounded-xl text-xs font-bold">Crítica</button>
+            <button data-grupo="prioridad" data-valor="baja" onclick="elegirChip(this)" class="interactive-btn chip border py-2 rounded-xl text-xs font-bold">Baja</button>
+            <button data-grupo="prioridad" data-valor="moderada" onclick="elegirChip(this)" class="interactive-btn chip border py-2 rounded-xl text-xs font-bold">Moderada</button>
+            <button data-grupo="prioridad" data-valor="alta" onclick="elegirChip(this)" class="interactive-btn chip border py-2 rounded-xl text-xs font-bold">Alta</button>
+            <button data-grupo="prioridad" data-valor="critica" onclick="elegirChip(this)" class="interactive-btn chip border py-2 rounded-xl text-xs font-bold">Crítica</button>
           </div>
         </div>
 
-        <!-- Canales de Notificación -->
+        <!-- Canales de Notificación (interruptores) -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-4">
           <span class="text-xs font-bold text-gray-900 uppercase">CANALES DE NOTIFICACIÓN</span>
           <div class="flex justify-between items-center text-sm py-1 border-b border-gray-50">
             <span class="text-gray-700">Notificación push</span>
-            <div class="w-11 h-6 bg-[#8B0000] rounded-full p-1 cursor-pointer flex justify-end">
-              <div class="w-4 h-4 bg-white rounded-full"></div>
-            </div>
+            <button role="switch" aria-checked="true" aria-label="Notificación push" data-canal="push" onclick="alternarInterruptor(this)" class="interruptor"><span class="perilla"></span></button>
           </div>
           <div class="flex justify-between items-center text-sm py-1 border-b border-gray-50">
             <span class="text-gray-700">SMS</span>
-            <div class="w-11 h-6 bg-[#8B0000] rounded-full p-1 cursor-pointer flex justify-end">
-              <div class="w-4 h-4 bg-white rounded-full"></div>
-            </div>
+            <button role="switch" aria-checked="true" aria-label="SMS" data-canal="sms" onclick="alternarInterruptor(this)" class="interruptor"><span class="perilla"></span></button>
           </div>
           <div class="flex justify-between items-center text-sm py-1">
             <span class="text-gray-700">Correo electrónico</span>
-            <div class="w-11 h-6 bg-gray-200 rounded-full p-1 cursor-pointer flex justify-start">
-              <div class="w-4 h-4 bg-white rounded-full"></div>
-            </div>
+            <button role="switch" aria-checked="false" aria-label="Correo electrónico" data-canal="correo" onclick="alternarInterruptor(this)" class="interruptor"><span class="perilla"></span></button>
           </div>
         </div>
 
-        <button class="interactive-btn w-full bg-[#8B0000] text-white font-bold py-3.5 rounded-2xl shadow-md text-base active:scale-95 transition">
+        <button onclick="guardarConfiguracion()" class="interactive-btn w-full bg-importante text-white font-bold py-3.5 rounded-2xl shadow-md text-base active:scale-95 transition">
           Guardar configuración
         </button>
       </div>
@@ -359,13 +445,13 @@
 
     <!-- PANTALLA 8: Detalle de Evento -->
     <div id="screen-8" class="screen flex-col bg-gray-50 text-gray-900 overflow-y-auto pb-6">
-      <div class="bg-[#8B0000] text-white px-6 pt-6 pb-6 rounded-b-3xl shadow-md">
+      <div class="bg-importante text-white px-6 pt-con-barra pb-6 rounded-b-3xl shadow-md">
         <div class="flex justify-between items-center">
           <div class="flex items-center gap-3">
-            <button onclick="navigateTo('screen-1')" class="interactive-btn p-1 rounded-full hover:bg-white/10">
+            <button onclick="volverAtras()" aria-label="Atrás" class="interactive-btn p-1 rounded-full hover:bg-white/10">
               <i data-lucide="arrow-left" class="w-6 h-6"></i>
             </button>
-            <h1 class="text-xl font-serif font-bold">Detalle de evento</h1>
+            <h1 class="text-xl font-titulo font-normal">Detalle de evento</h1>
           </div>
           <button class="interactive-btn p-2 rounded-full hover:bg-white/10">
             <i data-lucide="bell" class="w-6 h-6"></i>
@@ -376,14 +462,14 @@
       <div class="p-4 space-y-4">
         <!-- Encabezado Evento -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-          <div class="bg-[#8B0000] text-white p-3 rounded-2xl text-center min-w-[70px]">
-            <span class="text-2xl font-black block" id="detail-mag">6.2</span>
+          <div class="bg-importante text-white p-3 rounded-2xl text-center min-w-[70px]">
+            <span class="text-2xl font-bold block" id="detail-mag">6.2</span>
             <span class="text-[9px] uppercase font-bold tracking-wider opacity-80">Richter</span>
           </div>
           <div>
             <h2 class="text-lg font-bold text-gray-900" id="detail-title">Valle Central</h2>
             <p class="text-xs text-gray-500" id="detail-code">EVT-2026-0001 · 14:32:08 UTC</p>
-            <span class="inline-block mt-1 bg-red-100 text-[#8B0000] border border-red-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full" id="detail-status">Activo</span>
+            <span class="inline-block mt-1 bg-white text-importante border border-importante text-[10px] font-bold px-2.5 py-0.5 rounded-full" id="detail-status">Activo</span>
           </div>
         </div>
 
@@ -424,35 +510,23 @@
         <!-- Forma de Onda / Sismograma -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
           <span class="text-xs font-bold text-gray-900 uppercase block mb-2">FORMA DE ONDA</span>
-          <div class="h-28 w-full">
+          <div class="h-28 w-full" id="detail-wave-box">
             <canvas id="waveform-chart"></canvas>
           </div>
-          <p class="text-[10px] text-gray-400 mt-2 text-right">Canal HHZ · Estación VC-01 · 100 Hz</p>
+          <p class="hidden text-xs text-gray-500 py-6 text-center" id="detail-wave-vacio">No hay registro de forma de onda para este evento.</p>
+          <p class="text-[10px] text-gray-400 mt-2 text-right" id="detail-wave-caption">Canal HHZ · Estación VC-01 · 100 Hz</p>
         </div>
 
         <!-- Estaciones Registradas -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
           <span class="text-xs font-bold text-gray-900 uppercase block mb-3">ESTACIONES QUE LO REGISTRARON</span>
-          <div class="space-y-2 text-xs" id="detail-stations-list">
-            <div class="flex justify-between py-1 border-b border-gray-50">
-              <span class="font-bold">VC-01</span>
-              <span class="text-gray-500">12 km · PGA 0.82</span>
-            </div>
-            <div class="flex justify-between py-1 border-b border-gray-50">
-              <span class="font-bold">VC-02</span>
-              <span class="text-gray-500">28 km · PGA 0.45</span>
-            </div>
-            <div class="flex justify-between py-1">
-              <span class="font-bold">CN-05</span>
-              <span class="text-gray-500">65 km · PGA 0.12</span>
-            </div>
-          </div>
+          <div class="space-y-2 text-xs" id="detail-stations-list"></div>
         </div>
 
         <!-- Botones de Acción -->
         <div class="grid grid-cols-2 gap-3 pt-2">
-          <button class="interactive-btn border-2 border-[#8B0000] text-[#8B0000] font-bold py-3 rounded-2xl text-sm active:scale-95 transition">Descargar</button>
-          <button class="interactive-btn bg-[#8B0000] text-white font-bold py-3 rounded-2xl text-sm shadow active:scale-95 transition">Compartir</button>
+          <button class="interactive-btn border-2 border-importante text-importante font-bold py-3 rounded-2xl text-sm active:scale-95 transition">Descargar</button>
+          <button class="interactive-btn bg-importante text-white font-bold py-3 rounded-2xl text-sm shadow active:scale-95 transition">Compartir</button>
         </div>
       </div>
     </div>
@@ -465,71 +539,75 @@
         <div class="flex flex-col items-center">
           <div class="w-10 h-1 bg-gray-300 rounded-full mb-3"></div>
           <div class="w-full flex justify-between items-center">
-            <h3 class="text-2xl font-serif font-bold text-gray-900">Filtros</h3>
+            <h3 class="text-2xl font-titulo font-normal text-gray-900">Filtros</h3>
             <button onclick="closeFilterModal()" class="interactive-btn p-1 text-gray-400 hover:text-gray-600">
               <i data-lucide="x" class="w-6 h-6"></i>
             </button>
           </div>
         </div>
 
-        <!-- PERIODO -->
+        <!-- PERIODO (seleccion unica) -->
         <div>
           <span class="text-xs font-bold text-gray-900 uppercase tracking-wider block mb-2">PERIODO</span>
           <div class="flex flex-wrap gap-2">
-            <button class="interactive-btn bg-[#8B0000] text-white text-xs font-bold px-4 py-2 rounded-full">Hoy</button>
-            <button class="interactive-btn bg-white border border-gray-300 text-gray-700 text-xs font-bold px-4 py-2 rounded-full">7 días</button>
-            <button class="interactive-btn bg-white border border-gray-300 text-gray-700 text-xs font-bold px-4 py-2 rounded-full">30 días</button>
-            <button class="interactive-btn bg-white border border-gray-300 text-gray-700 text-xs font-bold px-4 py-2 rounded-full">Personalizado</button>
+            <button data-grupo="periodo" data-valor="hoy" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">Hoy</button>
+            <button data-grupo="periodo" data-valor="7" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">7 días</button>
+            <button data-grupo="periodo" data-valor="30" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">30 días</button>
+            <button data-grupo="periodo" data-valor="todo" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">Personalizado</button>
           </div>
         </div>
 
-        <!-- MAGNITUD -->
+        <!-- MAGNITUD MINIMA -->
         <div>
           <div class="flex justify-between items-center mb-2">
-            <span class="text-xs font-bold text-gray-900 uppercase tracking-wider">MAGNITUD</span>
+            <span class="text-xs font-bold text-gray-900 uppercase tracking-wider">MAGNITUD MÍNIMA</span>
+            <span class="text-xs font-bold text-gray-900 tabular-nums" id="valor-magnitud">2.0</span>
           </div>
           <div class="flex items-center gap-3">
             <span class="text-xs font-bold text-gray-600">2.0</span>
             <div class="relative w-full flex items-center">
-              <input type="range" min="2.0" max="9.5" step="0.1" value="2.0" class="w-full accent-[#8B0000] cursor-pointer">
+              <input type="range" id="filtro-magnitud" min="2.0" max="9.5" step="0.1" value="2.0" oninput="cambiarMagnitudFiltro(this.value)" class="w-full accent-importante cursor-pointer">
             </div>
             <span class="text-xs font-bold text-gray-600">9.5</span>
           </div>
         </div>
 
-        <!-- PROFUNDIDAD -->
+        <!-- PROFUNDIDAD (seleccion multiple; sin seleccion = todas) -->
         <div>
           <span class="text-xs font-bold text-gray-900 uppercase tracking-wider block mb-2">PROFUNDIDAD</span>
           <div class="flex flex-wrap gap-2">
-            <button class="interactive-btn bg-[#8B0000] text-white text-xs font-bold px-4 py-2 rounded-full">Superficial</button>
-            <button class="interactive-btn bg-white border border-gray-300 text-gray-700 text-xs font-bold px-4 py-2 rounded-full">Intermedio</button>
-            <button class="interactive-btn bg-white border border-gray-300 text-gray-700 text-xs font-bold px-4 py-2 rounded-full">Profundo</button>
+            <button data-grupo="profundidad" data-multi="si" data-valor="superficial" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">Superficial</button>
+            <button data-grupo="profundidad" data-multi="si" data-valor="intermedio" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">Intermedio</button>
+            <button data-grupo="profundidad" data-multi="si" data-valor="profundo" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">Profundo</button>
           </div>
         </div>
 
-        <!-- TIPO DE EVENTO -->
+        <!-- TIPO DE EVENTO (seleccion multiple; sin seleccion = todos) -->
         <div>
           <span class="text-xs font-bold text-gray-900 uppercase tracking-wider block mb-2">TIPO DE EVENTO</span>
           <div class="flex flex-wrap gap-2">
-            <button class="interactive-btn bg-[#8B0000] text-white text-xs font-bold px-4 py-2 rounded-full">Tectónico</button>
-            <button class="interactive-btn bg-white border border-gray-300 text-gray-700 text-xs font-bold px-4 py-2 rounded-full">Volcánico</button>
-            <button class="interactive-btn bg-white border border-gray-300 text-gray-700 text-xs font-bold px-4 py-2 rounded-full">Inducido</button>
-            <button class="interactive-btn bg-white border border-gray-300 text-gray-700 text-xs font-bold px-4 py-2 rounded-full">Explosión</button>
+            <button data-grupo="tipo" data-multi="si" data-valor="Tectónico" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">Tectónico</button>
+            <button data-grupo="tipo" data-multi="si" data-valor="Volcánico" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">Volcánico</button>
+            <button data-grupo="tipo" data-multi="si" data-valor="Inducido" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">Inducido</button>
+            <button data-grupo="tipo" data-multi="si" data-valor="Explosión" onclick="elegirChip(this)" class="interactive-btn chip border text-xs font-bold px-4 py-2 rounded-full">Explosión</button>
           </div>
         </div>
 
         <!-- BOTONES DE ACCIÓN -->
         <div class="grid grid-cols-2 gap-3 pt-2">
-          <button onclick="closeFilterModal()" class="interactive-btn border-2 border-[#8B0000] text-[#8B0000] font-bold py-3 rounded-2xl text-sm transition active:scale-95">Limpiar</button>
-          <button onclick="closeFilterModal()" class="interactive-btn bg-[#8B0000] text-white font-bold py-3 rounded-2xl text-sm shadow transition active:scale-95">Aplicar filtros</button>
+          <button onclick="limpiarFiltros()" class="interactive-btn border-2 border-importante text-importante font-bold py-3 rounded-2xl text-sm transition active:scale-95">Limpiar</button>
+          <button onclick="aplicarFiltros()" class="interactive-btn bg-importante text-white font-bold py-3 rounded-2xl text-sm shadow transition active:scale-95">Aplicar filtros</button>
         </div>
 
       </div>
     </div>
 
+    <!-- Aviso flotante para confirmaciones -->
+    <div id="aviso" role="status" class="absolute left-1/2 -translate-x-1/2 bottom-20 bg-gray-900 text-white text-sm font-bold px-4 py-2 rounded-xl opacity-0 pointer-events-none transition-opacity duration-300 z-[70]"></div>
+
     <!-- Navegación Inferior Móvil -->
     <div id="bottom-nav" class="absolute bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 flex justify-around items-center z-40">
-      <button onclick="navigateTo('screen-1')" id="nav-btn-screen-1" class="interactive-btn flex flex-col items-center gap-1 text-xs font-bold text-[#8B0000]">
+      <button onclick="navigateTo('screen-1')" id="nav-btn-screen-1" class="interactive-btn flex flex-col items-center gap-1 text-xs font-bold text-importante">
         <i data-lucide="home" class="w-5 h-5"></i>
         <span>Inicio</span>
       </button>

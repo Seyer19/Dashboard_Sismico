@@ -1,3 +1,9 @@
+/* Variables de la maqueta */
+:root {
+  --alto-barra: 2rem;          /* alto de la barra de estado simulada */
+  --color-barra: #880000;      /* color de fondo de la barra (cambia por pantalla) */
+}
+
 /* Transiciones de pantallas */
 .screen {
   display: none;
@@ -12,20 +18,109 @@
   display: flex;
 }
 
-/* Soporte para notch / safe areas en móviles reales */
-@supports (padding-top: env(safe-area-inset-top)) {
-  #device-container {
-    padding-top: env(safe-area-inset-top);
-  }
+/* Espacio superior para que el contenido no quede debajo de la barra de estado.
+   Se usa el id para ganar especificidad sobre p-6 de Tailwind. */
+#device-container .pt-con-barra {
+  padding-top: calc(var(--alto-barra) + 1.5rem);
 }
 
-/* Adaptabilidad para pantallas móviles sin marco desktop */
+/* Barra de estado: toma el color de la pantalla y se desvanece hacia abajo */
+#status-bar {
+  background-color: var(--color-barra);
+  color: #FFFFFF;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#status-bar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 10px;
+  background: linear-gradient(to bottom, var(--color-barra), transparent);
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+/* Variante clara para pantallas con fondo blanco */
+#status-bar.barra-clara {
+  color: #000000;
+}
+
+/* En un celular real se oculta la barra simulada y se respeta el notch */
 @media (max-width: 640px) {
+  :root {
+    --alto-barra: env(safe-area-inset-top, 0px);
+  }
+
+  #status-bar {
+    display: none;
+  }
+
   #device-container {
     height: 100vh;
+    height: 100dvh;
     max-width: 100%;
     border-radius: 0;
   }
+}
+
+/* Interruptores (canales de notificacion) */
+.interruptor {
+  width: 44px;
+  height: 24px;
+  padding: 4px;
+  border-radius: 9999px;
+  background-color: #E5E7EB;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.interruptor[aria-checked="true"] {
+  background-color: #880000;
+}
+
+.interruptor .perilla {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background-color: #FFFFFF;
+  transition: transform 0.2s ease;
+}
+
+.interruptor[aria-checked="true"] .perilla {
+  transform: translateX(20px);
+}
+
+/* Chips: transicion suave al seleccionar */
+.chip {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Listas desplegables de umbrales */
+.campo-select {
+  font-weight: 700;
+  background-color: #F3F4F6;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.campo-select:focus {
+  outline: 2px solid #880000;
+  outline-offset: 1px;
+}
+
+/* Anillo animado lento para la pantalla de sismo en curso */
+@keyframes ping-lento {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.7; }
+}
+
+.animate-ping-lento {
+  animation: ping-lento 1.2s ease-in-out infinite;
 }
 
 /* Efecto de prototipado Figma (Resaltado Azul Turquesa) */
@@ -35,7 +130,7 @@
   transition: all 0.1s ease-in-out;
 }
 
-/* Personalización del Scrollbar */
+/* Personalizacion del Scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
 }
